@@ -60,7 +60,7 @@ The app reads these environment variables from the Vite config:
 
 - `PORT`: dev and preview port, defaults to `5173`
 - `BASE_PATH`: deployment base path, defaults to `/`
-- `VITE_API_BASE_URL`: backend API base URL, defaults to `https://zapp-api.vmarketing.vn`
+- `VITE_API_BASE_URL`: backend API base URL, defaults to `https://zapp-dbt-api.vmarketing.vn`
 
 Example:
 

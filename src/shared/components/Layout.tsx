@@ -316,7 +316,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="hidden md:flex flex-1">
               <h1 className="text-lg font-semibold text-foreground">
-                Ủy ban Nhân dân Xã Tây Hồ
+                Ủy ban Nhân dân Xã Điện Bàn Tây
               </h1>
             </div>
             <div className="flex items-center gap-4">
