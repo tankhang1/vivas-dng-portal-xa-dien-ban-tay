@@ -18,8 +18,7 @@ import {
   Settings,
   Info,
   Phone,
-  Ticket,
-  // CalendarClock,
+  CalendarClock,
 } from 'lucide-react';
 import { Button, cn, Dialog, DialogFooter, DialogHeader, DialogTitle } from './ui';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
@@ -71,18 +70,16 @@ const navItems: NavItem[] = [
   },
   { name: 'Công dân', href: '/citizens', icon: BookUser },
   { name: 'Phản ánh - Kiến nghị', href: '/feedback', icon: MessageSquareWarning },
-  { name: 'Bốc số chờ', href: '/queue', icon: Ticket },
-  // { name: 'Đặt lịch hẹn', href: '/appointments', icon: CalendarClock },
-  { name: 'Điều phối', href: '/routing/feedback', icon: Waypoints },
-  // {
-  //   name: 'Điều phối',
-  //   menuKey: 'routing',
-  //   icon: Waypoints,
-  //   children: [
-  //     { name: 'Phản ánh - kiến nghị', href: '/routing/feedback', icon: MessageSquareWarning },
-  //     // { name: 'Đặt lịch hẹn', href: '/routing/schedule', icon: CalendarClock },
-  //   ],
-  // },
+  { name: 'Đặt lịch hẹn', href: '/appointments', icon: CalendarClock },
+  {
+    name: 'Điều phối',
+    menuKey: 'routing',
+    icon: Waypoints,
+    children: [
+      { name: 'Phản ánh - kiến nghị', href: '/routing/feedback', icon: MessageSquareWarning },
+      { name: 'Đặt lịch hẹn', href: '/routing/schedule', icon: CalendarClock },
+    ],
+  },
   {
     name: 'Cài đặt',
     menuKey: 'settings',
@@ -104,8 +101,7 @@ function getVisibleNavItems(isAdmin: boolean): NavItem[] {
       return visible;
     }
 
-    // if (item.href === '/dashboard' || item.href === '/feedback' || item.href === '/appointments') {
-    if (item.href === '/dashboard' || item.href === '/feedback' || item.href === '/queue') {
+    if (item.href === '/dashboard' || item.href === '/feedback' || item.href === '/appointments') {
       visible.push(item);
     }
     return visible;

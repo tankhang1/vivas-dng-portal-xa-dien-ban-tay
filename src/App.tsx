@@ -18,7 +18,6 @@ import CitizensCreate from "@/pages/citizens/Create";
 import CitizenDetail from "@/pages/citizens/Detail";
 import CitizensEdit from "@/pages/citizens/Edit";
 import Feedback from "@/pages/Feedback";
-import QueueWaitingPage from "@/pages/queue/QueueWaitingPage";
 import QueueTickets from "@/pages/queue-tickets/QueueTicketsPage";
 import GeneralSettingsPage from "@/pages/settings/GeneralSettingsPage";
 import HotlinePage from "@/pages/settings/hotline/HotlinePage";
@@ -135,7 +134,9 @@ function Router() {
         </RoleGate>
       </Route>
       <Route path="/feedback" component={Feedback} />
-      <Route path="/queue" component={QueueWaitingPage} />
+      <Route path="/queue">
+        <Redirect to="/appointments" />
+      </Route>
       <Route path="/appointments" component={QueueTickets} />
       <Route path="/settings/general">
         <RoleGate adminOnly>
