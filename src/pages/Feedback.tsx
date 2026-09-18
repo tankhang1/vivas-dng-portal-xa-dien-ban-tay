@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSearch } from "wouter";
 import { Layout } from "../shared/components/Layout";
 import {
   Badge,
@@ -37,6 +38,7 @@ import {
 import { useInfiniteCommentCategoriesQuery } from "@/features/category-comment/hooks/category-comment.hook";
 import { useInfiniteCommentsByCategoryQuery } from "@/features/comment/hooks/comment.hook";
 import { useInfiniteStaffCoordinateCommentsByStaffQuery } from "@/features/staff/hooks/staff.hook";
+import { getPublicCommentByUuid } from "@/features/comment/api/comment.api";
 import type { CommentItem } from "@/features/comment/types/get-comment.response";
 import type { CategoryItem } from "@/features/category-news/types/get-categories.response";
 import {
@@ -710,6 +712,8 @@ export default function Feedback() {
   const [replyFileName, setReplyFileName] = useState("");
   const [pendingAction, setPendingAction] =
     useState<PendingFeedbackAction | null>(null);
+  const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
+  const search = useSearch();
 
   const adminCategoriesQuery = useInfiniteCommentCategoriesQuery(
     { sz: PAGE_SIZE },
@@ -826,6 +830,32 @@ export default function Feedback() {
     setReplyFileName("");
     setIsDialogOpen(true);
   };
+
+  useEffect(() => {
+    const uuid = new URLSearchParams(search).get("uuid");
+    if (!uuid) return;
+
+    let cancelled = false;
+
+    getPublicCommentByUuid(uuid)
+      .then((item) => {
+        if (cancelled) return;
+        setSelectedCategoryId(item.category_item);
+        setActiveTab(item.status === 1 ? "approved" : "pending");
+        handleOpenDetail(item);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setDeepLinkError(
+          "Không có phản ánh - kiến nghị này, vui lòng thử lại sau.",
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   const handleReplyFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1024,6 +1054,19 @@ export default function Feedback() {
         canManageFeedback={canManageFeedback}
         canApproveCategory={selectedCategoryCanApprove}
       />
+
+      <Dialog
+        open={deepLinkError !== null}
+        onOpenChange={() => setDeepLinkError(null)}
+      >
+        <DialogHeader>
+          <DialogTitle>Không tìm thấy phản ánh</DialogTitle>
+        </DialogHeader>
+        <p className="py-2 text-sm text-muted-foreground">{deepLinkError}</p>
+        <DialogFooter>
+          <Button onClick={() => setDeepLinkError(null)}>Đóng</Button>
+        </DialogFooter>
+      </Dialog>
 
       <Dialog
         open={pendingAction !== null}
