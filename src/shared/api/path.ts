@@ -119,6 +119,8 @@ export const API_PATH = {
     CITIZEN_PROFILE: (zaloUserId: number | string) => `/common-portal/profile/${zaloUserId}`,
     SCHEDULES_BY_CATEGORY: (categoryId: number | string) =>
       `/common-portal/schedules/${categoryId}`,
+    SCHEDULE_DETAIL: (scheduleUuid: string) =>
+      `/common-portal/schedules-detail/${scheduleUuid}`,
     NUMBERS_BY_QUEUE: (queueId: number | string) =>
       `/common-portal/number/queue/${queueId}`,
     STAFF: '/common-portal/staff',

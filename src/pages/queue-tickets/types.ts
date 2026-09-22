@@ -41,6 +41,13 @@ export function scheduleStatus(item: ScheduleItem) {
   return statusMeta.pending;
 }
 
+export function scheduleTabOf(item: ScheduleItem): ScheduleListTab {
+  if (item.status === 3) return "cancelled";
+  if (item.status === 2) return "completed";
+  if (item.status === 1) return "confirmed";
+  return "pending";
+}
+
 export const formatDateTime = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;

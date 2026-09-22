@@ -1,7 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearch } from "wouter";
 
 import { Layout } from "@/shared/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Dialog,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs";
 import { useInfiniteScheduleCategoriesQuery } from "@/features/category-schedule/hooks/category-schedule.hook";
 import {
@@ -11,6 +22,7 @@ import {
   useTimeScheduleQuery,
 } from "@/features/schedule/hooks/schedule.hook";
 import { useInfiniteStaffCoordinateSchedulesByStaffQuery } from "@/features/staff/hooks/staff.hook";
+import { getScheduleDetail } from "@/features/schedule/api/schedule.api";
 import type { CategoryItem } from "@/features/category-news/types/get-categories.response";
 import type { ScheduleItem } from "@/features/schedule/types/get-schedules.response";
 import { CURRENT_STAFF } from "@/pages/news/types";
@@ -23,6 +35,7 @@ import { ConfirmActionDialog } from "./components/ConfirmActionDialog";
 import {
   PAGE_SIZE,
   scheduleStatus,
+  scheduleTabOf,
   statusMeta,
   type PendingScheduleAction,
   type ScheduleListTab,
@@ -35,6 +48,9 @@ export default function QueueTicketsPage() {
   const [current, setCurrent] = useState<ScheduleItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingScheduleAction | null>(null);
+  const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
+  const deepLinkHandledRef = useRef(false);
+  const search = useSearch();
   const timeScheduleQuery = useTimeScheduleQuery();
   const timeScheduleMap = useMemo(
     () =>
@@ -77,6 +93,7 @@ export default function QueueTicketsPage() {
   }, [adminCategoriesQuery.data?.pages, isAdminRole, staffCategoriesQuery.data?.pages]);
 
   useEffect(() => {
+    if (deepLinkHandledRef.current && selectedCategoryId !== "") return;
     if (categories.length > 0 && !categories.some((item) => item.id === selectedCategoryId)) {
       setSelectedCategoryId(categories[0].id);
     }
@@ -117,6 +134,31 @@ export default function QueueTicketsPage() {
     setCurrent(item);
     setIsDialogOpen(true);
   };
+
+  useEffect(() => {
+    const uuid = new URLSearchParams(search).get("uuid");
+    if (!uuid) return;
+
+    let cancelled = false;
+
+    getScheduleDetail({ scheduleUuid: uuid })
+      .then((item) => {
+        if (cancelled) return;
+        deepLinkHandledRef.current = true;
+        setSelectedCategoryId(item.category_item);
+        setActiveTab(scheduleTabOf(item));
+        handleOpenDetail(item);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setDeepLinkError("Không có lịch hẹn này, vui lòng thử lại sau.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
   const buildActionPayload = (item: ScheduleItem) => ({
     zalo_user_id: item.zalo_user_id,
@@ -239,6 +281,19 @@ export default function QueueTicketsPage() {
         timeScheduleMap={timeScheduleMap}
         canManage={!isAdminRole}
       />
+
+      <Dialog
+        open={deepLinkError !== null}
+        onOpenChange={() => setDeepLinkError(null)}
+      >
+        <DialogHeader>
+          <DialogTitle>Không tìm thấy lịch hẹn</DialogTitle>
+        </DialogHeader>
+        <p className="py-2 text-sm text-muted-foreground">{deepLinkError}</p>
+        <DialogFooter>
+          <Button onClick={() => setDeepLinkError(null)}>Đóng</Button>
+        </DialogFooter>
+      </Dialog>
 
       <ConfirmActionDialog
         pendingAction={pendingAction}

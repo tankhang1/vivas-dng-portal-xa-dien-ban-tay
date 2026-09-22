@@ -1,6 +1,8 @@
 import { API_PATH, apiClient } from "@/shared/api";
 import type { ConfirmScheduleMeetProcessRequest } from "@/features/schedule/types/confirm-schedule-meet-process.request";
 import type { ConfirmScheduleMeetProcessResponse } from "@/features/schedule/types/confirm-schedule-meet-process.response";
+import type { GetScheduleDetailRequest } from "@/features/schedule/types/get-schedule-detail.request";
+import type { GetScheduleDetailResponse } from "@/features/schedule/types/get-schedule-detail.response";
 import type { GetSchedulesByCategoryRequest } from "@/features/schedule/types/get-schedules-by-category.request";
 import type { GetSchedulesResponse } from "@/features/schedule/types/get-schedules.response";
 import type { GetTimeScheduleResponse } from "@/features/schedule/types/get-time-schedule.response";
@@ -55,6 +57,16 @@ export async function getSchedulesByCategory(
     query
       ? `${API_PATH.COMMON_PORTAL.SCHEDULES_BY_CATEGORY(request.categoryId)}?${query}`
       : API_PATH.COMMON_PORTAL.SCHEDULES_BY_CATEGORY(request.categoryId),
+  );
+
+  return response.data;
+}
+
+export async function getScheduleDetail(
+  request: GetScheduleDetailRequest,
+): Promise<GetScheduleDetailResponse> {
+  const response = await apiClient.get<GetScheduleDetailResponse>(
+    API_PATH.COMMON_PORTAL.SCHEDULE_DETAIL(request.scheduleUuid),
   );
 
   return response.data;

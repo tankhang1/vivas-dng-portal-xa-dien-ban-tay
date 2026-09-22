@@ -8,12 +8,15 @@ import {
 
 import {
   confirmScheduleMeetProcess,
+  getScheduleDetail,
   getTimeSchedule,
   getSchedulesByCategory,
   resolveScheduleMeetProcess,
 } from "@/features/schedule/api/schedule.api";
 import type { ConfirmScheduleMeetProcessRequest } from "@/features/schedule/types/confirm-schedule-meet-process.request";
 import type { ConfirmScheduleMeetProcessResponse } from "@/features/schedule/types/confirm-schedule-meet-process.response";
+import type { GetScheduleDetailRequest } from "@/features/schedule/types/get-schedule-detail.request";
+import type { GetScheduleDetailResponse } from "@/features/schedule/types/get-schedule-detail.response";
 import type { GetSchedulesByCategoryRequest } from "@/features/schedule/types/get-schedules-by-category.request";
 import type { GetSchedulesResponse } from "@/features/schedule/types/get-schedules.response";
 import type { GetTimeScheduleResponse } from "@/features/schedule/types/get-time-schedule.response";
@@ -96,5 +99,18 @@ export function useInfiniteSchedulesByCategoryQuery(
       categoryId !== undefined &&
       categoryId !== null &&
       categoryId !== "",
+  });
+}
+
+export function useScheduleDetailQuery(
+  request: GetScheduleDetailRequest,
+  enabled = true,
+) {
+  const { scheduleUuid } = request;
+
+  return useQuery<GetScheduleDetailResponse>({
+    queryKey: QUERY_KEY.SCHEDULE_DETAIL(scheduleUuid),
+    queryFn: () => getScheduleDetail(request),
+    enabled: enabled && !!scheduleUuid,
   });
 }

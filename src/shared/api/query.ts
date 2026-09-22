@@ -107,6 +107,8 @@ export const QUERY_KEY = {
     categoryId: number | string,
     params: { sz?: number; nu?: number },
   ) => ['schedules', 'category', categoryId, params] as const,
+  SCHEDULE_DETAIL: (scheduleUuid: string) =>
+    ['schedules', 'detail', scheduleUuid] as const,
   NUMBERS_BY_QUEUE: (
     queueId: number | string,
     params: { sz?: number; nu?: number },
